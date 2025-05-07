@@ -4,13 +4,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'models/task_model.dart';
 import 'views/home_view.dart';
 import 'services/notification_service.dart';
+import 'controllers/task_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init(); // Initialize notifications
   await Hive.initFlutter();
   Hive.registerAdapter(TaskModelAdapter());
-  await Hive.openBox<TaskModel>("tasks");
+  await Hive.openBox<TaskModel>("taskbox");
+  Get.put(TaskController());
   runApp(const MyApp());
 }
 

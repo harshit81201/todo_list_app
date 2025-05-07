@@ -34,21 +34,27 @@ class HomeView extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Search tasks...',
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onChanged: (value) {
-                controller.tasks.value = controller.searchTasks(value);
+                controller.searchTasks(value);
               },
             ),
           ),
           Expanded(
             child: Obx(() {
               return ListView.builder(
-                itemCount: controller.tasks.length,
+                itemCount: controller.filteredTasks.length,
                 itemBuilder: (context, index) {
-                  final TaskModel task = controller.tasks[index];
+                  final TaskModel task = controller.filteredTasks[index];
+
                   return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: ListTile(
                       title: Text(task.title),
                       subtitle: Text(
@@ -62,11 +68,13 @@ class HomeView extends StatelessWidget {
                         },
                       ),
                       onTap: () {
-                        Get.to(() => TaskFormView(
-                              isEdit: true,
-                              task: task,
-                              index: index,
-                            ));
+                        Get.to(
+                          () => TaskFormView(
+                            isEdit: true,
+                            task: task,
+                            index: index,
+                          ),
+                        );
                       },
                     ),
                   );
