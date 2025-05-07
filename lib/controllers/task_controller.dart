@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import '../models/task_model.dart';
+import '../services/notification_service.dart';
 
 class TaskController extends GetxController {
   var tasks = <TaskModel>[].obs;
@@ -20,11 +21,14 @@ class TaskController extends GetxController {
   void addTask(TaskModel task) {
     taskBox.add(task);
     loadTasks();
+    scheduleReminder(task, tasks.length - 1); // use index as ID
   }
 
   void updateTask(int index, TaskModel updatedTask) {
-    taskBox.putAt(index, updatedTask);
-    loadTasks();
+    tasks[index] = updatedTask;
+    _box.putAt(index, updatedTask);
+    NotificationService.cancelNotification(index);
+    scheduleReminder(updatedTask, index);
   }
 
   void deleteTask(int index) {
@@ -45,9 +49,23 @@ class TaskController extends GetxController {
   }
 
   List<TaskModel> searchTasks(String query) {
-    return tasks.where((task) =>
-      task.title.toLowerCase().contains(query.toLowerCase()) ||
-      task.description.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+    return tasks
+        .where(
+          (task) =>
+              task.title.toLowerCase().contains(query.toLowerCase()) ||
+              task.description.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
+  }
+
+  void scheduleReminder(TaskModel task, int id) {
+    if (task.dueDate.isAfter(DateTime.now())) {
+      NotificationService.scheduleNotification(
+        id: id,
+        title: 'Task Reminder',
+        body: '${task.title} is due soon!',
+        scheduledDate: task.dueDate.subtract(const Duration(minutes: 10)),
+      );
+    }
   }
 }

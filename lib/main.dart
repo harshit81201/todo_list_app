@@ -3,17 +3,14 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/task_model.dart';
 import 'views/home_view.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Hive and register adapter
+  await NotificationService.init(); // Initialize notifications
   await Hive.initFlutter();
   Hive.registerAdapter(TaskModelAdapter());
-
-  // Open the Hive box for tasks
-  await Hive.openBox<TaskModel>('tasks');
-
+  await Hive.openBox<TaskModel>("tasks");
   runApp(const MyApp());
 }
 
