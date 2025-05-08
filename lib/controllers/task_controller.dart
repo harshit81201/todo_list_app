@@ -10,8 +10,6 @@ class TaskController extends GetxController {
   var filteredTasks = <TaskModel>[].obs;
   var searchQuery = ''.obs;
   var sortOption = 'Creation Date'.obs;
-
-  // Define consistent notification time offset
   static const notificationOffset = Duration(minutes: 10);
 
   // Flag to track if we need to run Hive adapter migration

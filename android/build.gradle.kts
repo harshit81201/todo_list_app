@@ -16,6 +16,11 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+plugins {
+    kotlin("android") version "1.8.22"
+    // or use latest compatible version
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

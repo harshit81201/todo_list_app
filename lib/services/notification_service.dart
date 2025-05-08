@@ -2,10 +2,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:developer' as developer;
-import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:async'; // For Timer
-import 'package:flutter_native_timezone/flutter_native_timezone.dart'; // Add this package
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -28,22 +26,17 @@ class NotificationService {
     tz.initializeTimeZones();
 
     try {
-      // Get the local timezone reliably using flutter_native_timezone package
-      final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+      // Set timezone directly without using flutter_native_timezone
       try {
-        tz.setLocalLocation(tz.getLocation(timeZoneName));
-        print('[INIT] Time zone set to $timeZoneName');
+        // Using a default timezone instead of detecting - change this to match your target region
+        // You might want to hardcode the timezone that most of your users are in
+        tz.setLocalLocation(tz.getLocation('America/New_York'));
+        print('[INIT] Time zone set to America/New_York (default)');
       } catch (e) {
-        print('[INIT] Error setting timezone to $timeZoneName: $e');
-        // Fallback to a common timezone like America/New_York rather than UTC
-        try {
-          tz.setLocalLocation(tz.getLocation('America/New_York'));
-          print('[INIT] Fallback to America/New_York timezone');
-        } catch (tzError) {
-          // Last resort fallback
-          tz.setLocalLocation(tz.UTC);
-          print('[INIT] Failed to set timezone, using UTC: $tzError');
-        }
+        print('[INIT] Error setting timezone: $e');
+        // Fallback to UTC
+        tz.setLocalLocation(tz.UTC);
+        print('[INIT] Fallback to UTC timezone');
       }
 
       const AndroidInitializationSettings androidInit =
@@ -53,9 +46,7 @@ class NotificationService {
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true,
-        onDidReceiveLocalNotification: (id, title, body, payload) async {
-          print('[iOS] Received notification: $id, $title');
-        },
+        
       );
 
       final InitializationSettings settings = InitializationSettings(
@@ -193,8 +184,6 @@ class NotificationService {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
       );
 
       print('[SEND TEST] Test notification scheduled successfully.');
@@ -354,8 +343,6 @@ class NotificationService {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         payload: payload,
       );
 
